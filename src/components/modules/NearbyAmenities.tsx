@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Coffee, Trees } from 'lucide-react'
+import { Coffee } from 'lucide-react'
 
 export function NearbyAmenities() {
   const [isCollapsed, setIsCollapsed] = useState(true)
