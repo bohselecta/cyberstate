@@ -1,0 +1,1138 @@
+{
+  "project": {
+    "name": "CyberState MLS Dashboard",
+    "description": "Monochrome sci-fi real estate search interface with advanced data visualization",
+    "version": "1.0.0",
+    "target_platform": "desktop_primary",
+    "aesthetic": "retro_futurism_80s_terminal"
+  },
+
+  "data_architecture": {
+    "mls_integration": {
+      "source": "IDX Feed (Internet Data Exchange)",
+      "note": "MLS data is syndicated to brokers/sites via IDX agreements. Photos, descriptions, and listing details are provided by listing agents and distributed through regional MLS systems.",
+      "update_frequency": "on_refresh",
+      "primary_fields": [
+        "listing_id",
+        "address",
+        "price",
+        "beds",
+        "baths",
+        "sqft",
+        "lot_size",
+        "year_built",
+        "property_type",
+        "status",
+        "days_on_market",
+        "photos",
+        "description",
+        "lat",
+        "lng",
+        "hoa_fees",
+        "tax_amount",
+        "parking",
+        "heating_cooling",
+        "appliances"
+      ],
+      "enriched_data": [
+        "price_per_sqft",
+        "price_history",
+        "neighborhood_stats",
+        "school_ratings",
+        "crime_index",
+        "walkability_score",
+        "transit_score",
+        "nearby_amenities",
+        "market_trends",
+        "comparable_sales"
+      ]
+    },
+
+    "state_management": {
+      "global_state": {
+        "active_listing": "currently selected property object",
+        "map_bounds": "current viewport coordinates",
+        "filter_criteria": "user search parameters",
+        "visible_listings": "array of listings in current view",
+        "ui_theme": "amber | green",
+        "expanded_panel": "map | photo_viewer | null"
+      },
+      "update_triggers": [
+        "map_interaction",
+        "filter_change",
+        "listing_selection",
+        "panel_expansion",
+        "data_refresh"
+      ]
+    }
+  },
+
+  "design_system": {
+    "color_palettes": {
+      "amber_mode": {
+        "primary": "#FF9500",
+        "secondary": "#FFB347",
+        "accent": "#FFA500",
+        "background": "#0A0A0A",
+        "panel_bg": "#111111",
+        "text": "#FFCC80",
+        "glow": "rgba(255, 149, 0, 0.6)",
+        "grid_lines": "rgba(255, 165, 0, 0.2)"
+      },
+      "green_mode": {
+        "primary": "#00FF00",
+        "secondary": "#00CC00",
+        "accent": "#33FF33",
+        "background": "#0A0A0A",
+        "panel_bg": "#0F0F0F",
+        "text": "#66FF66",
+        "glow": "rgba(0, 255, 0, 0.5)",
+        "grid_lines": "rgba(0, 255, 0, 0.15)"
+      }
+    },
+
+    "typography": {
+      "primary_font": "Orbitron, monospace",
+      "fallback": "Courier New, monospace",
+      "sizes": {
+        "h1": "28px",
+        "h2": "22px",
+        "h3": "18px",
+        "body": "14px",
+        "label": "12px",
+        "data": "16px"
+      },
+      "weights": {
+        "normal": 400,
+        "medium": 500,
+        "bold": 700
+      }
+    },
+
+    "effects": {
+      "glow": {
+        "text_shadow": "0 0 10px currentColor, 0 0 20px currentColor",
+        "box_shadow": "0 0 20px var(--glow), inset 0 0 20px var(--glow)"
+      },
+      "scanlines": {
+        "background": "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
+        "animation": "scanline 8s linear infinite"
+      },
+      "borders": {
+        "standard": "1px solid var(--primary)",
+        "glow_border": "1px solid var(--primary), box-shadow: 0 0 10px var(--glow)"
+      },
+      "animations": {
+        "pulse": "pulse 2s ease-in-out infinite",
+        "flicker": "flicker 0.15s infinite",
+        "slide_in": "slideIn 0.4s ease-out"
+      }
+    },
+
+    "grid_system": {
+      "type": "css_grid",
+      "columns": 24,
+      "gap": "16px",
+      "padding": "20px"
+    }
+  },
+
+  "master_layout": {
+    "viewport": {
+      "min_width": "1920px",
+      "recommended": "2560px",
+      "height": "100vh",
+      "overflow": "hidden"
+    },
+
+    "grid_template": {
+      "description": "Fixed grid layout, no scrolling, single-page interface",
+      "structure": "4x3 primary grid with nested sub-grids",
+      
+      "regions": {
+        "header": {
+          "position": "row 1, span 24 columns",
+          "height": "80px",
+          "contents": ["logo", "search_bar", "filter_controls", "system_status"]
+        },
+
+        "sidebar_left": {
+          "position": "row 2-4, columns 1-4",
+          "width": "320px",
+          "contents": ["listing_queue", "filter_panel", "saved_searches"]
+        },
+
+        "main_content": {
+          "position": "row 2-4, columns 5-20",
+          "dynamic": true,
+          "contents": {
+            "default_state": ["map_view", "property_viewer"],
+            "expanded_map": ["map_view_full"],
+            "expanded_photo": ["property_viewer_full"]
+          }
+        },
+
+        "sidebar_right": {
+          "position": "row 2-4, columns 21-24",
+          "width": "320px",
+          "contents": ["data_modules_stack"]
+        }
+      }
+    },
+
+    "responsive_breakpoints": {
+      "desktop": ">= 1920px",
+      "tablet": "768px - 1919px (not prioritized)",
+      "mobile": "< 768px"
+    }
+  },
+
+  "modules": {
+    "header_module": {
+      "id": "global_header",
+      "type": "system_bar",
+      "height": "80px",
+      "layout": "horizontal_flex",
+      
+      "components": {
+        "logo": {
+          "position": "left",
+          "width": "200px",
+          "content": "CYBERSTATE ASCII logo with animated scanlines",
+          "animation": "subtle_glow_pulse"
+        },
+
+        "search_bar": {
+          "position": "center_left",
+          "width": "400px",
+          "type": "autocomplete_input",
+          "placeholder": "> ENTER LOCATION | ZIP | ADDRESS",
+          "features": [
+            "predictive_search",
+            "recent_searches",
+            "voice_input_optional"
+          ],
+          "styling": "terminal_input_with_cursor_blink"
+        },
+
+        "filter_chips": {
+          "position": "center",
+          "type": "horizontal_scroll",
+          "filters": [
+            {
+              "label": "PRICE",
+              "type": "range_slider",
+              "min": 0,
+              "max": 10000000,
+              "step": 50000
+            },
+            {
+              "label": "BEDS",
+              "type": "multi_select",
+              "options": ["1+", "2+", "3+", "4+", "5+"]
+            },
+            {
+              "label": "BATHS",
+              "type": "multi_select",
+              "options": ["1+", "2+", "3+", "4+"]
+            },
+            {
+              "label": "SQFT",
+              "type": "range_slider",
+              "min": 0,
+              "max": 10000,
+              "step": 100
+            },
+            {
+              "label": "TYPE",
+              "type": "multi_select",
+              "options": ["HOUSE", "CONDO", "TOWNHOUSE", "MULTI_FAMILY"]
+            }
+          ]
+        },
+
+        "system_status": {
+          "position": "right",
+          "width": "240px",
+          "displays": [
+            {
+              "label": "LISTINGS_LOADED",
+              "value": "dynamic_count",
+              "animation": "count_up"
+            },
+            {
+              "label": "LAST_SYNC",
+              "value": "timestamp",
+              "format": "HH:MM:SS"
+            },
+            {
+              "label": "THEME",
+              "value": "toggle_button",
+              "options": ["AMBER", "GREEN"]
+            }
+          ]
+        }
+      }
+    },
+
+    "listing_queue": {
+      "id": "listing_sidebar",
+      "type": "scrollable_list",
+      "position": "sidebar_left",
+      "height": "calc(100vh - 80px)",
+      
+      "behavior": {
+        "data_source": "filtered_listings",
+        "sort_options": ["price_asc", "price_desc", "newest", "sqft"],
+        "max_visible": "dynamic",
+        "virtual_scrolling": true
+      },
+
+      "list_item_card": {
+        "height": "120px",
+        "layout": "grid_2_columns",
+        
+        "components": {
+          "thumbnail": {
+            "width": "100px",
+            "height": "100px",
+            "aspect_ratio": "1:1",
+            "overlay": "price_badge"
+          },
+          
+          "info": {
+            "lines": [
+              {
+                "content": "$PRICE | BEDS bd | BATHS ba",
+                "style": "bold_primary"
+              },
+              {
+                "content": "SQFT sqft | $PRICE_PER_SQFT/sqft",
+                "style": "secondary"
+              },
+              {
+                "content": "ADDRESS_SHORT",
+                "style": "text_small"
+              },
+              {
+                "content": "DOM days | STATUS",
+                "style": "accent_glow"
+              }
+            ]
+          }
+        },
+
+        "states": {
+          "default": "border_standard",
+          "hover": "glow_border + scale_1.02",
+          "selected": "full_glow + bold_border"
+        },
+
+        "interaction": "click_to_select_listing"
+      }
+    },
+
+    "map_view": {
+      "id": "interactive_map",
+      "type": "geo_visualization",
+      "position": "main_content_left",
+      "default_size": "60% width, 100% height",
+      "expanded_size": "100% width, 100% height",
+
+      "map_provider": "mapbox | google_maps | custom",
+      "style": "dark_custom",
+      "tile_overlay": "scanline_effect",
+
+      "layers": {
+        "base_map": {
+          "style": "dark_monochrome",
+          "suppress_labels": "partially",
+          "color_override": "match_theme"
+        },
+
+        "listing_markers": {
+          "type": "custom_svg_nodes",
+          "design": "pulsing_hexagon_or_dot",
+          "size": "12px default, 18px hover, 24px selected",
+          "color": {
+            "default": "primary",
+            "in_budget": "accent",
+            "out_of_budget": "secondary_dimmed",
+            "selected": "glow_animated"
+          },
+          "clustering": {
+            "enabled": true,
+            "zoom_threshold": 12,
+            "cluster_icon": "hexagon_with_count"
+          }
+        },
+
+        "heat_map_overlay": {
+          "optional": true,
+          "data": "price_density | listing_density",
+          "opacity": 0.3,
+          "gradient": ["theme_primary_transparent", "theme_accent"]
+        },
+
+        "boundary_overlays": {
+          "school_districts": "toggle",
+          "zip_codes": "toggle",
+          "crime_zones": "toggle",
+          "walkability": "toggle"
+        }
+      },
+
+      "interactions": {
+        "click_marker": "select_listing + update_all_modules",
+        "drag": "update_visible_listings",
+        "zoom": "re_cluster + update_data",
+        "hover_marker": "show_quick_info_tooltip"
+      },
+
+      "controls": {
+        "zoom": "bottom_right",
+        "layers_toggle": "top_right",
+        "fullscreen": "top_right",
+        "reset_view": "top_right"
+      },
+
+      "tooltip_on_hover": {
+        "content": [
+          "$PRICE",
+          "BEDS bd | BATHS ba",
+          "SQFT sqft"
+        ],
+        "style": "terminal_popup",
+        "delay": "200ms"
+      }
+    },
+
+    "property_viewer": {
+      "id": "main_property_display",
+      "type": "media_viewer",
+      "position": "main_content_right",
+      "default_size": "40% width, 100% height",
+      "expanded_size": "100% width, 100% height",
+
+      "layout": "vertical_stack",
+
+      "components": {
+        "photo_carousel": {
+          "height": "65%",
+          "type": "high_res_gallery",
+          
+          "features": {
+            "main_image": {
+              "aspect_ratio": "16:9",
+              "fit": "cover",
+              "border": "glow_border",
+              "overlay_ui": {
+                "position": "bottom",
+                "elements": [
+                  "image_counter",
+                  "fullscreen_button",
+                  "favorite_button"
+                ]
+              }
+            },
+
+            "thumbnail_strip": {
+              "position": "bottom",
+              "height": "80px",
+              "scroll": "horizontal",
+              "thumbnails": {
+                "size": "70x70",
+                "gap": "8px",
+                "border": "1px primary",
+                "active_indicator": "glow"
+              }
+            },
+
+            "navigation": {
+              "arrows": "left_right_overlay",
+              "keyboard": "arrow_keys",
+              "swipe": "touch_enabled"
+            },
+
+            "lightbox": {
+              "trigger": "click_main_image",
+              "style": "fullscreen_modal",
+              "background": "rgba(0,0,0,0.95)"
+            }
+          }
+        },
+
+        "property_header": {
+          "height": "120px",
+          "layout": "grid",
+          
+          "elements": {
+            "price": {
+              "size": "h1",
+              "style": "bold_glow",
+              "format": "$XXX,XXX"
+            },
+            
+            "address": {
+              "size": "h3",
+              "lines": [
+                "street_address",
+                "city, state zip"
+              ]
+            },
+
+            "quick_stats": {
+              "layout": "horizontal_flex",
+              "stats": [
+                {
+                  "icon": "bed",
+                  "value": "beds",
+                  "label": "BEDS"
+                },
+                {
+                  "icon": "bath",
+                  "value": "baths",
+                  "label": "BATHS"
+                },
+                {
+                  "icon": "ruler",
+                  "value": "sqft",
+                  "label": "SQFT"
+                },
+                {
+                  "icon": "calendar",
+                  "value": "year_built",
+                  "label": "BUILT"
+                }
+              ],
+              "style": "icon_stat_pairs_with_dividers"
+            },
+
+            "action_buttons": {
+              "buttons": [
+                {
+                  "label": "SCHEDULE_TOUR",
+                  "style": "primary_glow_button"
+                },
+                {
+                  "label": "SAVE",
+                  "style": "secondary_outline"
+                },
+                {
+                  "label": "SHARE",
+                  "style": "secondary_outline"
+                }
+              ]
+            }
+          }
+        },
+
+        "property_tabs": {
+          "height": "auto",
+          "type": "tab_interface",
+          
+          "tabs": [
+            {
+              "id": "overview",
+              "label": "OVERVIEW",
+              "content": {
+                "type": "scrollable_details",
+                "sections": [
+                  {
+                    "title": "DESCRIPTION",
+                    "content": "full_listing_description",
+                    "max_height": "200px",
+                    "overflow": "scroll"
+                  },
+                  {
+                    "title": "PROPERTY_DETAILS",
+                    "content": "key_value_grid",
+                    "data": [
+                      "property_type",
+                      "lot_size",
+                      "parking",
+                      "hoa_fees",
+                      "tax_amount",
+                      "heating_cooling",
+                      "appliances"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "price_history",
+              "label": "PRICE_HISTORY",
+              "content": {
+                "type": "line_chart",
+                "x_axis": "date",
+                "y_axis": "price",
+                "style": "terminal_graph"
+              }
+            },
+            {
+              "id": "comparables",
+              "label": "COMPS",
+              "content": {
+                "type": "mini_cards_grid",
+                "data_source": "comparable_sales",
+                "card_template": "compact_listing_card"
+              }
+            }
+          ]
+        }
+      },
+
+      "expansion_behavior": {
+        "trigger": "fullscreen_button",
+        "effect": "hide_map + expand_to_full_main_content",
+        "animation": "slide_expand_400ms"
+      }
+    },
+
+    "data_modules_stack": {
+      "id": "analytics_sidebar",
+      "type": "vertical_stacked_modules",
+      "position": "sidebar_right",
+      "height": "calc(100vh - 80px)",
+      "scroll": "vertical_smooth",
+
+      "note": "Each module is a self-contained data visualization mini-app",
+
+      "modules": [
+        {
+          "id": "market_pulse",
+          "title": "MARKET_PULSE",
+          "height": "180px",
+          "collapsible": true,
+          
+          "visualization": {
+            "type": "real_time_ticker",
+            "metrics": [
+              {
+                "label": "AVG_PRICE",
+                "value": "dynamic",
+                "trend": "up | down | flat",
+                "trend_indicator": "animated_arrow"
+              },
+              {
+                "label": "DAYS_ON_MARKET",
+                "value": "dynamic",
+                "comparison": "vs_last_month"
+              },
+              {
+                "label": "INVENTORY",
+                "value": "count",
+                "sparkline": "7_day_trend"
+              }
+            ]
+          }
+        },
+
+        {
+          "id": "neighborhood_intel",
+          "title": "NEIGHBORHOOD_INTEL",
+          "height": "280px",
+          "collapsible": true,
+          "data_source": "selected_listing_location",
+
+          "visualization": {
+            "type": "radial_chart",
+            "metrics": [
+              {
+                "label": "SCHOOLS",
+                "value": "0-10_rating",
+                "icon": "graduation_cap"
+              },
+              {
+                "label": "WALKABILITY",
+                "value": "0-100_score",
+                "icon": "walking"
+              },
+              {
+                "label": "TRANSIT",
+                "value": "0-100_score",
+                "icon": "bus"
+              },
+              {
+                "label": "SAFETY",
+                "value": "low_med_high",
+                "icon": "shield"
+              },
+              {
+                "label": "RESTAURANTS",
+                "value": "count",
+                "icon": "utensils"
+              },
+              {
+                "label": "PARKS",
+                "value": "count",
+                "icon": "tree"
+              }
+            ],
+            "style": "hexagonal_radar_chart"
+          }
+        },
+
+        {
+          "id": "price_analytics",
+          "title": "PRICE_ANALYTICS",
+          "height": "220px",
+          "collapsible": true,
+
+          "visualization": {
+            "type": "comparison_bars",
+            "data": [
+              {
+                "label": "THIS_LISTING",
+                "value": "selected_price_per_sqft",
+                "bar_color": "accent_glow"
+              },
+              {
+                "label": "NEIGHBORHOOD_AVG",
+                "value": "neighborhood_avg",
+                "bar_color": "secondary"
+              },
+              {
+                "label": "CITY_AVG",
+                "value": "city_avg",
+                "bar_color": "primary_dimmed"
+              }
+            ],
+            "additional_metrics": [
+              {
+                "label": "ESTIMATED_VALUE",
+                "value": "zestimate_equivalent"
+              },
+              {
+                "label": "VALUE_TREND",
+                "value": "12_month_projection",
+                "display": "percentage_with_arrow"
+              }
+            ]
+          }
+        },
+
+        {
+          "id": "commute_calculator",
+          "title": "COMMUTE_CALC",
+          "height": "200px",
+          "collapsible": true,
+          "interactive": true,
+
+          "components": {
+            "destination_input": {
+              "type": "autocomplete",
+              "placeholder": "> ENTER_WORK_ADDRESS",
+              "save_favorites": true
+            },
+
+            "results_display": {
+              "layout": "vertical_list",
+              "routes": [
+                {
+                  "mode": "DRIVE",
+                  "time": "XX_min",
+                  "distance": "XX_mi",
+                  "icon": "car"
+                },
+                {
+                  "mode": "TRANSIT",
+                  "time": "XX_min",
+                  "transfers": "X",
+                  "icon": "train"
+                },
+                {
+                  "mode": "BIKE",
+                  "time": "XX_min",
+                  "distance": "XX_mi",
+                  "icon": "bicycle"
+                }
+              ]
+            }
+          }
+        },
+
+        {
+          "id": "financial_calculator",
+          "title": "MORTGAGE_CALC",
+          "height": "280px",
+          "collapsible": true,
+          "interactive": true,
+
+          "components": {
+            "inputs": {
+              "layout": "vertical_stack",
+              "fields": [
+                {
+                  "label": "DOWN_PAYMENT",
+                  "type": "slider",
+                  "range": "0-100%",
+                  "default": "20%"
+                },
+                {
+                  "label": "INTEREST_RATE",
+                  "type": "number_input",
+                  "default": "current_market_rate"
+                },
+                {
+                  "label": "LOAN_TERM",
+                  "type": "select",
+                  "options": ["15_YR", "30_YR"]
+                }
+              ]
+            },
+
+            "output_display": {
+              "type": "breakdown_chart",
+              "metrics": [
+                {
+                  "label": "MONTHLY_PAYMENT",
+                  "value": "calculated",
+                  "size": "large_bold"
+                },
+                {
+                  "label": "PRINCIPAL_INTEREST",
+                  "value": "calculated",
+                  "percentage_of_total": true
+                },
+                {
+                  "label": "PROPERTY_TAX",
+                  "value": "estimated_monthly"
+                },
+                {
+                  "label": "HOA_INSURANCE",
+                  "value": "estimated_monthly"
+                },
+                {
+                  "label": "TOTAL_INTEREST",
+                  "value": "over_loan_life"
+                }
+              ],
+              "visualization": "stacked_bar_or_donut"
+            }
+          }
+        },
+
+        {
+          "id": "amenities_proximity",
+          "title": "NEARBY",
+          "height": "240px",
+          "collapsible": true,
+
+          "visualization": {
+            "type": "distance_list",
+            "categories": [
+              {
+                "icon": "coffee",
+                "label": "COFFEE_SHOPS",
+                "items": [
+                  {
+                    "name": "place_name",
+                    "distance": "0.X_mi",
+                    "walk_time": "X_min"
+                  }
+                ],
+                "max_items": 3
+              },
+              {
+                "icon": "cart",
+                "label": "GROCERIES",
+                "items": "same_format",
+                "max_items": 3
+              },
+              {
+                "icon": "dumbbell",
+                "label": "FITNESS",
+                "items": "same_format",
+                "max_items": 3
+              },
+              {
+                "icon": "hospital",
+                "label": "HEALTHCARE",
+                "items": "same_format",
+                "max_items": 3
+              }
+            ],
+            "expandable": "show_more_button"
+          }
+        },
+
+        {
+          "id": "historical_context",
+          "title": "PROPERTY_HISTORY",
+          "height": "200px",
+          "collapsible": true,
+
+          "visualization": {
+            "type": "timeline",
+            "events": [
+              {
+                "date": "YYYY-MM-DD",
+                "event": "SOLD",
+                "price": "$XXX,XXX",
+                "icon": "sold_stamp"
+              },
+              {
+                "date": "YYYY-MM-DD",
+                "event": "LISTED",
+                "price": "$XXX,XXX",
+                "icon": "tag"
+              },
+              {
+                "date": "YYYY",
+                "event": "BUILT",
+                "icon": "hammer"
+              }
+            ],
+            "style": "vertical_timeline_with_connecting_lines"
+          }
+        }
+      ]
+    }
+  },
+
+  "interaction_flows": {
+    "primary_user_journey": {
+      "steps": [
+        {
+          "action": "USER_ENTERS_LOCATION",
+          "trigger": "search_bar_submit",
+          "effects": [
+            "map_centers_on_location",
+            "listings_load_in_sidebar",
+            "data_modules_show_area_stats"
+          ]
+        },
+        {
+          "action": "USER_APPLIES_FILTERS",
+          "trigger": "filter_chips_change",
+          "effects": [
+            "listings_filter_in_real_time",
+            "map_markers_update",
+            "market_pulse_updates"
+          ]
+        },
+        {
+          "action": "USER_CLICKS_MAP_MARKER",
+          "trigger": "map_marker_click",
+          "effects": [
+            "listing_selects_in_sidebar",
+            "property_viewer_loads_photos",
+            "data_modules_update_for_property",
+            "map_marker_highlights"
+          ]
+        },
+        {
+          "action": "USER_CLICKS_LISTING_CARD",
+          "trigger": "sidebar_listing_click",
+          "effects": [
+            "map_centers_on_listing",
+            "map_marker_highlights",
+            "property_viewer_updates",
+            "data_modules_refresh"
+          ]
+        },
+        {
+          "action": "USER_EXPANDS_PHOTO_VIEWER",
+          "trigger": "fullscreen_button",
+          "effects": [
+            "map_collapses_or_hides",
+            "photo_viewer_expands_to_60-70%_width",
+            "animation_smooth_transition"
+          ]
+        },
+        {
+          "action": "USER_NAVIGATES_PHOTOS",
+          "trigger": "arrow_keys_or_thumbnails",
+          "effects": [
+            "main_image_transitions",
+            "thumbnail_highlights"
+          ]
+        },
+        {
+          "action": "USER_INTERACTS_WITH_DATA_MODULE",
+          "trigger": "module_specific_controls",
+          "effects": [
+            "module_updates_independently",
+            "may_affect_map_overlays",
+            "may_update_other_modules_if_relevant"
+          ]
+        }
+      ]
+    },
+
+    "state_transitions": {
+      "no_listing_selected": {
+        "map_view": "default_zoom_on_search_area",
+        "property_viewer": "placeholder_or_featured_listings",
+        "data_modules": "area_aggregate_stats"
+      },
+      
+      "listing_selected": {
+        "map_view": "centered_on_property_with_highlighted_marker",
+        "property_viewer": "full_property_details",
+        "data_modules": "property_specific_data"
+      },
+
+      "panel_expanded": {
+        "map_expanded": {
+          "map_view": "100%_width",
+          "property_viewer": "hidden_or_overlay",
+          "data_modules": "visible"
+        },
+        "photo_expanded": {
+          "map_view": "compressed_or_hidden",
+          "property_viewer": "70%_width",
+          "data_modules": "visible"
+        }
+      }
+    }
+  },
+
+  "mobile_adaptation": {
+    "viewport": "< 768px",
+    "layout_strategy": "single_column_stack",
+
+    "structure": {
+      "header": {
+        "height": "60px",
+        "components": [
+          "hamburger_menu",
+          "logo_compact",
+          "filter_button"
+        ]
+      },
+
+      "map_module": {
+        "position": "top",
+        "height": "40vh",
+        "always_visible": true,
+        "interactions": {
+          "touch_zoom": true,
+          "touch_pan": true,
+          "marker_tap": "select_listing + scroll_to_details"
+        }
+      },
+
+      "selected_property_title": {
+        "position": "below_map",
+        "height": "60px",
+        "content": "property_address_and_price",
+        "sticky": true,
+        "background": "semi_transparent_panel"
+      },
+
+      "modules_stack": {
+        "position": "below_title",
+        "layout": "vertical_accordion",
+        "behavior": "collapse_all_by_default",
+        
+        "module_order": [
+          "photo_carousel_module",
+          "property_header_module",
+          "overview_details_module",
+          "neighborhood_intel_module",
+          "price_analytics_module",
+          "commute_calculator_module",
+          "mortgage_calculator_module",
+          "amenities_module",
+          "property_history_module"
+        ],
+
+        "module_behavior": {
+          "collapsed_height": "60px",
+          "expanded_height": "auto",
+          "interaction": "tap_header_to_toggle",
+          "animation": "smooth_expand_collapse"
+        }
+      },
+
+      "floating_action_buttons": {
+        "position": "bottom_right",
+        "buttons": [
+          {
+            "icon": "filter",
+            "action": "open_filter_drawer"
+          },
+          {
+            "icon": "list",
+            "action": "open_listings_drawer"
+          }
+        ]
+      }
+    },
+
+    "drawers": {
+      "filter_drawer": {
+        "trigger": "filter_button",
+        "direction": "slide_from_top",
+        "height": "80vh",
+        "content": "full_filter_interface"
+      },
+
+      "listings_drawer": {
+        "trigger": "list_button",
+        "direction": "slide_from_bottom",
+        "height": "70vh",
+        "content": "scrollable_listing_cards"
+      }
+    }
+  },
+
+  "technical_implementation_notes": {
+    "frontend_stack": {
+      "framework": "React",
+      "state_management": "Zustand | Redux | Context",
+      "mapping": "Mapbox GL JS | Google Maps API",
+      "charts": "D3.js | Recharts",
+      "styling": "Styled-components | Tailwind with custom theme",
+      "animations": "Framer Motion | GSAP"
+    },
+
+    "performance_optimizations": {
+      "map_markers": "Use canvas rendering for 1000+ markers",
+      "images": "Lazy loading, WebP format, responsive srcset",
+      "data_modules": "Virtual scrolling for long lists",
+      "state": "Debounce filter inputs, throttle map interactions",
+      "caching": "Cache MLS data, use service workers for offline"
+    },
+
+    "3d_graphics_consideration": {
+      "option_1_simple": "Use CSS transforms for depth effects on UI elements",
+      "option_2_moderate": "Three.js for 3D building footprints on map",
+      "option_3_advanced": "Full 3D neighborhood visualization with flyover capability",
+      "recommendation": "Start with option_1, add option_2 if performance allows"
+    },
+
+    "mls_data_handling": {
+      "integration": "IDX feed via RETS or API",
+      "caching": "Redis for active listings",
+      "updates": "Webhook or polling every 15min",
+      "photos": "CDN with image optimization pipeline"
+    }
+  },
+
+  "accessibility": {
+    "keyboard_navigation": "Full support for all interactions",
+    "screen_readers": "ARIA labels on all interactive elements",
+    "contrast": "WCAG AA compliant in both color modes",
+    "focus_indicators": "Visible glow effect on focus"
+  },
+
+  "future_enhancements": {
+    "phase_2": [
+      "User accounts with saved searches",
+      "Price drop alerts",
+      "Virtual tours integration",
+      "3D floor plans",
+      "AR property visualization"
+    ],
+    "phase_3": [
+      "AI-powered recommendations",
+      "Market prediction analytics",
+      "Collaborative browsing sessions",
+      "Agent chat integration"
+    ]
+  }
+}
