@@ -18,6 +18,7 @@ body {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
+  min-width: 320px; /* Ensure minimum width for mobile */
 }
 
 /* Amber mode */
@@ -93,4 +94,31 @@ body.green .cyber-glow {
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
+}
+
+/* Responsive utilities */
+@media (max-width: 1024px) {
+  .pixel-corners::before,
+  .pixel-corners::after {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pixel-corners::before,
+  .pixel-corners::after {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+  }
+}
+
+/* Ensure map containers are responsive */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
 }
