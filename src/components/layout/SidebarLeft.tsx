@@ -1,11 +1,15 @@
 import { useData } from '../../context/DataContext'
 import { ListingCard } from '../ui/ListingCard'
+import { LogoModule } from '../modules/LogoModule'
 
 export function SidebarLeft() {
   const { listings, selectedListing, setSelectedListing } = useData()
 
   return (
     <div className="w-full h-full bg-cyber-panel border border-current flex flex-col cyber-glow">
+
+      {/* Logo Module */}
+      <LogoModule />
 
       {/* Header */}
       <div className="p-4 border-b border-current">
