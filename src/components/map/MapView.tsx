@@ -1,123 +1,77 @@
 import { useEffect, useRef, useState } from 'react'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import './mapbox-styles.css'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useData } from '../../context/DataContext'
 import { useTheme } from '../../context/ThemeContext'
 
-// You'll need to get a free Mapbox token from https://mapbox.com
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example'
+// Fix for default markers in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
 
-export function MapView() {
-  const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<mapboxgl.Map | null>(null)
-  const [mapLoaded, setMapLoaded] = useState(false)
-  const { selectedListing, setLayoutState, listings } = useData()
-  const { mode } = useTheme()
+// Custom cyberpunk marker
+const createCyberMarker = (color: string) => {
+  return L.divIcon({
+    className: 'cyber-marker',
+    html: `
+      <div style="
+        width: 20px;
+        height: 20px;
+        background: ${color};
+        border: 2px solid #111111;
+        border-radius: 50%;
+        box-shadow: 0 0 10px ${color};
+        animation: pulse 2s infinite;
+      "></div>
+    `,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  })
+}
+
+// Component to handle map updates
+function MapUpdater() {
+  const map = useMap()
+  const { selectedListing } = useData()
 
   useEffect(() => {
-    if (map.current) return // Initialize map only once
-
-    if (!mapContainer.current) return
-
-    // Set Mapbox access token
-    mapboxgl.accessToken = MAPBOX_TOKEN
-
-    // Create map with cyberpunk dark style
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11', // Dark theme
-      center: [-122.4194, 37.7749], // San Francisco
-      zoom: 12,
-      attributionControl: false, // Hide attribution for cleaner look
-    })
-
-    // Add custom cyberpunk styling
-    map.current.on('load', () => {
-      setMapLoaded(true)
-      
-      // Add custom layer for cyberpunk effect
-      if (map.current) {
-        map.current.addSource('cyberpunk-overlay', {
-          type: 'raster',
-          tiles: ['data:image/svg+xml;base64,' + btoa(`
-            <svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-                  <path d="M 32 0 L 0 0 0 32" fill="none" stroke="${mode === 'green' ? '#00FF00' : '#FF9500'}" stroke-width="0.5" opacity="0.3"/>
-                </pattern>
-              </defs>
-              <rect width="256" height="256" fill="url(#grid)"/>
-            </svg>
-          `)],
-          tileSize: 256
-        })
-
-        map.current.addLayer({
-          id: 'cyberpunk-grid',
-          type: 'raster',
-          source: 'cyberpunk-overlay',
-          paint: {
-            'raster-opacity': 0.2
-          }
-        })
-      }
-    })
-
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
-
-    // Add custom markers for listings
-    listings.forEach((listing) => {
-      if (map.current) {
-        const marker = new mapboxgl.Marker({
-          color: mode === 'green' ? '#00FF00' : '#FF9500',
-          scale: selectedListing?.id === listing.id ? 1.2 : 0.8
-        })
-          .setLngLat([listing.lng, listing.lat])
-          .addTo(map.current)
-
-        // Add click handler
-        marker.getElement().addEventListener('click', () => {
-          // This would trigger listing selection
-          console.log('Marker clicked:', listing.address)
-        })
-
-        // Add popup
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          closeButton: false,
-          className: 'cyber-popup'
-        }).setHTML(`
-          <div class="cyber-popup-content">
-            <div class="font-bold text-sm">$${listing.price.toLocaleString()}</div>
-            <div class="text-xs opacity-80">${listing.beds}bd ${listing.baths}ba</div>
-            <div class="text-xs">${listing.sqft.toLocaleString()} sqft</div>
-          </div>
-        `)
-
-        marker.setPopup(popup)
-      }
-    })
-
-    return () => {
-      if (map.current) {
-        map.current.remove()
-        map.current = null
-      }
-    }
-  }, [listings, selectedListing, mode])
-
-  // Update map center when listing is selected
-  useEffect(() => {
-    if (map.current && selectedListing) {
-      map.current.flyTo({
-        center: [selectedListing.lng, selectedListing.lat],
-        zoom: 15,
-        duration: 1000
+    if (selectedListing) {
+      map.flyTo([selectedListing.lat, selectedListing.lng], 15, {
+        duration: 1
       })
     }
-  }, [selectedListing])
+  }, [selectedListing, map])
+
+  return null
+}
+
+export function MapView() {
+  const { selectedListing, setLayoutState, listings } = useData()
+  const { mode } = useTheme()
+  const [mapLoaded, setMapLoaded] = useState(false)
+
+  const cyberColor = mode === 'green' ? '#00FF00' : '#FF9500'
+
+  // Custom tile layer for cyberpunk dark theme
+  const cyberpunkTileLayer = (
+    <TileLayer
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      className="cyber-tiles"
+    />
+  )
+
+  // Alternative dark tile options (uncomment to try different styles)
+  // const darkTileLayer = (
+  //   <TileLayer
+  //     attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+  //     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+  //   />
+  // )
 
   return (
     <div className="w-full h-full bg-cyber-bg border border-current flex flex-col">
@@ -149,21 +103,42 @@ export function MapView() {
 
       {/* Map Container */}
       <div className="flex-1 relative">
-        <div 
-          ref={mapContainer} 
-          className="w-full h-full"
-          style={{ minHeight: '400px' }}
-        />
+        <MapContainer
+          center={[37.7749, -122.4194]} // San Francisco
+          zoom={12}
+          style={{ height: '100%', width: '100%' }}
+          className="cyber-map"
+        >
+          {cyberpunkTileLayer}
+          
+          {/* Property Markers */}
+          {listings.map((listing) => (
+            <Marker
+              key={listing.id}
+              position={[listing.lat, listing.lng]}
+              icon={createCyberMarker(cyberColor)}
+            >
+              <Popup className="cyber-popup">
+                <div className="cyber-popup-content">
+                  <div className="font-bold text-sm glow-text">
+                    ${listing.price.toLocaleString()}
+                  </div>
+                  <div className="text-xs opacity-80">
+                    {listing.beds}bd {listing.baths}ba
+                  </div>
+                  <div className="text-xs">
+                    {listing.sqft.toLocaleString()} sqft
+                  </div>
+                  <div className="text-xs mt-1">
+                    {listing.address.split(',')[0]}
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
 
-        {/* Loading overlay */}
-        {!mapLoaded && (
-          <div className="absolute inset-0 bg-cyber-bg flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin w-8 h-8 border-2 border-current border-t-transparent rounded-full mx-auto mb-2"></div>
-              <div className="text-sm font-mono">LOADING MAP...</div>
-            </div>
-          </div>
-        )}
+          <MapUpdater />
+        </MapContainer>
 
         {/* Selected Property Indicator */}
         {selectedListing && (
@@ -177,26 +152,11 @@ export function MapView() {
         <div className="absolute top-4 right-4 flex flex-col space-y-1">
           <button
             className="w-8 h-8 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all"
-            aria-label="Zoom In"
-            onClick={() => map.current?.zoomIn()}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          </button>
-          <button
-            className="w-8 h-8 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all"
-            aria-label="Zoom Out"
-            onClick={() => map.current?.zoomOut()}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
-            </svg>
-          </button>
-          <button
-            className="w-8 h-8 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all"
             aria-label="Reset View"
-            onClick={() => map.current?.flyTo({ center: [-122.4194, 37.7749], zoom: 12 })}
+            onClick={() => {
+              // This would reset the map view
+              console.log('Reset view clicked')
+            }}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -204,35 +164,42 @@ export function MapView() {
           </button>
         </div>
 
-        {/* Grid Overlay Toggle */}
+        {/* Info Panel */}
         <div className="absolute bottom-4 right-4">
-          <button 
-            className="px-3 py-1 text-xs border border-current hover:bg-current hover:text-cyber-bg transition-all"
-            onClick={() => {
-              if (map.current) {
-                const visibility = map.current.getLayoutProperty('cyberpunk-grid', 'visibility')
-                map.current.setLayoutProperty('cyberpunk-grid', 'visibility', visibility === 'visible' ? 'none' : 'visible')
-              }
-            }}
-          >
-            GRID OVERLAY
-          </button>
+          <div className="bg-cyber-panel border border-current p-2 text-xs">
+            <div className="opacity-80">FREE MAP TILES</div>
+            <div>OpenStreetMap + Leaflet</div>
+          </div>
         </div>
 
       </div>
 
       <style jsx>{`
-        :global(.cyber-popup .mapboxgl-popup-content) {
+        :global(.cyber-map) {
+          filter: hue-rotate(${mode === 'green' ? '120deg' : '30deg'}) saturate(1.2) contrast(1.1);
+        }
+        
+        :global(.cyber-popup .leaflet-popup-content-wrapper) {
           background: #111111 !important;
-          border: 1px solid ${mode === 'green' ? '#00FF00' : '#FF9500'} !important;
-          color: ${mode === 'green' ? '#00FF00' : '#FF9500'} !important;
+          border: 1px solid ${cyberColor} !important;
+          color: ${cyberColor} !important;
           font-family: 'Orbitron', 'Courier New', monospace !important;
-          padding: 8px !important;
           border-radius: 0 !important;
         }
         
-        :global(.cyber-popup .mapboxgl-popup-tip) {
-          border-top-color: ${mode === 'green' ? '#00FF00' : '#FF9500'} !important;
+        :global(.cyber-popup .leaflet-popup-tip) {
+          background: #111111 !important;
+          border: 1px solid ${cyberColor} !important;
+        }
+        
+        :global(.cyber-marker) {
+          animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+          0% { box-shadow: 0 0 10px ${cyberColor}; }
+          50% { box-shadow: 0 0 20px ${cyberColor}; }
+          100% { box-shadow: 0 0 10px ${cyberColor}; }
         }
       `}</style>
 
