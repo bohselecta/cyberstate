@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
@@ -52,7 +52,6 @@ function MapUpdater() {
 export function MapView() {
   const { selectedListing, setLayoutState, listings } = useData()
   const { mode } = useTheme()
-  const [mapLoaded, setMapLoaded] = useState(false)
 
   const cyberColor = mode === 'green' ? '#00FF00' : '#FF9500'
 
@@ -174,12 +173,12 @@ export function MapView() {
 
       </div>
 
-      <style jsx>{`
-        :global(.cyber-map) {
+      <style>{`
+        .cyber-map {
           filter: hue-rotate(${mode === 'green' ? '120deg' : '30deg'}) saturate(1.2) contrast(1.1);
         }
         
-        :global(.cyber-popup .leaflet-popup-content-wrapper) {
+        .cyber-popup .leaflet-popup-content-wrapper {
           background: #111111 !important;
           border: 1px solid ${cyberColor} !important;
           color: ${cyberColor} !important;
@@ -187,12 +186,12 @@ export function MapView() {
           border-radius: 0 !important;
         }
         
-        :global(.cyber-popup .leaflet-popup-tip) {
+        .cyber-popup .leaflet-popup-tip {
           background: #111111 !important;
           border: 1px solid ${cyberColor} !important;
         }
         
-        :global(.cyber-marker) {
+        .cyber-marker {
           animation: pulse 2s infinite;
         }
         
