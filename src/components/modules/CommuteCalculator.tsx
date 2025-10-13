@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Car, Train, Bike } from 'lucide-react'
+import { useState } from 'react'
+import { Car } from 'lucide-react'
 
 export function CommuteCalculator() {
   const [isCollapsed, setIsCollapsed] = useState(true)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Heart, Maximize } from 'lucide-react'
 
 interface PhotoCarouselProps {

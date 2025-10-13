@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 
 // Types based on the spec
 export interface Property {
@@ -136,7 +136,7 @@ interface DataProviderProps {
 }
 
 export function DataProvider({ children }: DataProviderProps) {
-  const [listings, setListings] = useState<Listing[]>(mockListings)
+  const [listings] = useState<Listing[]>(mockListings)
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null)
   const [layoutState, setLayoutState] = useState<LayoutState>('default')
   const [filterCriteria, setFilterCriteria] = useState({})

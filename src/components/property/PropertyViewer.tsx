@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { ChevronLeft, ChevronRight, Heart, Share, Calendar, Maximize } from 'lucide-react'
+import { useState } from 'react'
+import { Heart, Share, Calendar, Maximize } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 import { PhotoCarousel } from './PhotoCarousel'
 import { PropertyDetails } from './PropertyDetails'

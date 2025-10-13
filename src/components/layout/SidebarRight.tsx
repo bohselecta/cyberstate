@@ -1,4 +1,3 @@
-import React from 'react'
 import { MarketPulse } from '../modules/MarketPulse'
 import { NeighborhoodIntel } from '../modules/NeighborhoodIntel'
 import { PriceAnalytics } from '../modules/PriceAnalytics'

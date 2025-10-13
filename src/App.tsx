@@ -1,4 +1,3 @@
-import React from 'react'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 import { ThemeProvider } from './context/ThemeContext'
 import { DataProvider } from './context/DataContext'

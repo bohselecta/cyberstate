@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { MapPin, GraduationCap, Route, Shield, Utensils, Tree } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, GraduationCap, Route, Shield, Utensils, Trees } from 'lucide-react'
 
 export function NeighborhoodIntel() {
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -38,7 +38,7 @@ export function NeighborhoodIntel() {
     {
       label: 'PARKS',
       value: 8,
-      icon: Tree,
+      icon: Trees,
       color: 'text-green-500'
     }
   ]

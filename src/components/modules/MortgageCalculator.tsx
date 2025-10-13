@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Calculator, Home } from 'lucide-react'
+import { useState } from 'react'
+import { Calculator } from 'lucide-react'
 
 export function MortgageCalculator() {
   const [isCollapsed, setIsCollapsed] = useState(true) // Start collapsed as it's complex

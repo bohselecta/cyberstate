@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Clock, DollarSign, Tag, Hammer } from 'lucide-react'
 
 export function PropertyHistory() {

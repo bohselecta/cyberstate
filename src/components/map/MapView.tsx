@@ -1,4 +1,3 @@
-import React from 'react'
 import { Map, ZoomIn, ZoomOut, RotateCcw, Layers, Maximize } from 'lucide-react'
 import { useData } from '../../context/DataContext'
 
