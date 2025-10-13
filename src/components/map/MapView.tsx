@@ -50,7 +50,7 @@ function MapUpdater() {
 }
 
 export function MapView() {
-  const { selectedListing, setLayoutState, listings } = useData()
+  const { setLayoutState, listings } = useData()
   const { mode } = useTheme()
 
   const cyberColor = mode === 'green' ? '#00FF00' : '#FF9500'
@@ -116,24 +116,7 @@ export function MapView() {
               key={listing.id}
               position={[listing.lat, listing.lng]}
               icon={createCyberMarker(cyberColor)}
-            >
-              <Popup className="cyber-popup">
-                <div className="cyber-popup-content">
-                  <div className="font-bold text-sm glow-text">
-                    ${listing.price.toLocaleString()}
-                  </div>
-                  <div className="text-xs opacity-80">
-                    {listing.beds}bd {listing.baths}ba
-                  </div>
-                  <div className="text-xs">
-                    {listing.sqft.toLocaleString()} sqft
-                  </div>
-                  <div className="text-xs mt-1">
-                    {listing.address.split(',')[0]}
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
+            />
           ))}
 
           <MapUpdater />
