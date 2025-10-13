@@ -139,13 +139,6 @@ export function MapView() {
           <MapUpdater />
         </MapContainer>
 
-        {/* Selected Property Indicator */}
-        {selectedListing && (
-          <div className="absolute top-4 left-4 bg-cyber-panel border border-current p-2 text-xs">
-            <div className="font-bold">{selectedListing.address.split(',')[0]}</div>
-            <div className="opacity-80">${selectedListing.price.toLocaleString()}</div>
-          </div>
-        )}
 
         {/* Map Controls */}
         <div className="absolute top-4 right-4 flex flex-col space-y-1">
