@@ -4,6 +4,8 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 export interface Property {
   id: string
   address: string
+  city: string
+  zipCode: string
   price: number
   beds: number
   baths: number
@@ -65,6 +67,8 @@ const mockListings: Listing[] = [
   {
     id: '1',
     address: '123 Main St, San Francisco, CA',
+    city: 'San Francisco',
+    zipCode: '94102',
     price: 1250000,
     beds: 3,
     baths: 2,
@@ -100,6 +104,8 @@ const mockListings: Listing[] = [
   {
     id: '2',
     address: '456 Oak Ave, Oakland, CA',
+    city: 'Oakland',
+    zipCode: '94610',
     price: 850000,
     beds: 2,
     baths: 2,
