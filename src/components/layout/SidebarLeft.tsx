@@ -3,7 +3,7 @@ import { ListingCard } from '../ui/ListingCard'
 import { LogoModule } from '../modules/LogoModule'
 
 export function SidebarLeft() {
-  const { listings, selectedListing, setSelectedListing } = useData()
+  const { filteredListings, selectedListing, setSelectedListing } = useData()
 
   return (
     <div className="w-full h-full bg-cyber-panel border border-current flex flex-col cyber-glow">
@@ -15,14 +15,14 @@ export function SidebarLeft() {
       <div className="p-4 border-b border-current">
         <h3 className="text-sm font-bold glow-text">◢ LISTING QUEUE ◣</h3>
         <div className="text-xs opacity-70 mt-1">
-          {listings.length} PROPERTIES LOADED
+          {filteredListings.length} PROPERTIES LOADED
         </div>
       </div>
 
       {/* Scrollable Listing Cards */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-2 space-y-2">
-          {listings.map((listing) => (
+          {filteredListings.map((listing) => (
             <ListingCard
               key={listing.id}
               listing={listing}

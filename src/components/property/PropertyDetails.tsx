@@ -23,19 +23,62 @@ export function PropertyDetails({ listing, activeTab }: PropertyDetailsProps) {
           <div className="grid grid-cols-2 gap-4 text-xs">
 
             <div className="space-y-2">
-              <div><strong>Type:</strong> {listing.propertyType}</div>
-              <div><strong>Year Built:</strong> {listing.yearBuilt}</div>
-              <div><strong>Lot Size:</strong> {listing.lotSize ? `${listing.lotSize.toLocaleString()} sqft` : 'N/A'}</div>
-              <div><strong>Parking:</strong> {listing.parking || 'N/A'}</div>
+              <div className="flex justify-between items-center">
+                <span><strong>Type:</strong></span>
+                <span className="glow-text">{listing.propertyType}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Year Built:</strong></span>
+                <span className="glow-text">{listing.yearBuilt}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Lot Size:</strong></span>
+                <span className="glow-text">{listing.lotSize ? `${listing.lotSize.toLocaleString()} sqft` : 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Parking:</strong></span>
+                <span className="glow-text">{listing.parking || 'N/A'}</span>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <div><strong>HOA Fees:</strong> {listing.hoaFees ? `$${listing.hoaFees}/mo` : 'None'}</div>
-              <div><strong>Property Tax:</strong> {listing.taxAmount ? `$${listing.taxAmount}/yr` : 'N/A'}</div>
-              <div><strong>Heating/Cooling:</strong> {listing.heatingCooling || 'N/A'}</div>
-              <div><strong>Appliances:</strong> {listing.appliances ? listing.appliances.join(', ') : 'N/A'}</div>
+              <div className="flex justify-between items-center">
+                <span><strong>HOA Fees:</strong></span>
+                <span className="glow-text">{listing.hoaFees ? `$${listing.hoaFees}/mo` : 'None'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Property Tax:</strong></span>
+                <span className="glow-text">{listing.taxAmount ? `$${listing.taxAmount}/yr` : 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Heating/Cooling:</strong></span>
+                <span className="glow-text">{listing.heatingCooling || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span><strong>Appliances:</strong></span>
+                <span className="glow-text">{listing.appliances ? listing.appliances.join(', ') : 'N/A'}</span>
+              </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* Key Metrics */}
+        <div>
+          <h4 className="text-sm font-bold mb-3 glow-text">KEY METRICS</h4>
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="bg-cyber-bg border border-current p-2 text-center">
+              <div className="font-bold glow-text">${listing.pricePerSqft}</div>
+              <div className="opacity-80">per sqft</div>
+            </div>
+            <div className="bg-cyber-bg border border-current p-2 text-center">
+              <div className="font-bold glow-text">{listing.daysOnMarket}</div>
+              <div className="opacity-80">days on market</div>
+            </div>
+            <div className="bg-cyber-bg border border-current p-2 text-center">
+              <div className="font-bold glow-text">{listing.beds + listing.baths}</div>
+              <div className="opacity-80">total rooms</div>
+            </div>
           </div>
         </div>
 

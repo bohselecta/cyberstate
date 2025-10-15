@@ -14,22 +14,27 @@ L.Icon.Default.mergeOptions({
 })
 
 // Custom cyberpunk marker
-const createCyberMarker = (color: string) => {
+const createCyberMarker = (color: string, isSelected: boolean = false) => {
+  const size = isSelected ? 24 : 20
+  const glowIntensity = isSelected ? 20 : 10
+  
   return L.divIcon({
-    className: 'cyber-marker',
+    className: `cyber-marker ${isSelected ? 'selected' : ''}`,
     html: `
       <div style="
-        width: 20px;
-        height: 20px;
+        width: ${size}px;
+        height: ${size}px;
         background: ${color};
         border: 2px solid #111111;
         border-radius: 50%;
-        box-shadow: 0 0 10px ${color};
-        animation: pulse 2s infinite;
+        box-shadow: 0 0 ${glowIntensity}px ${color};
+        animation: ${isSelected ? 'pulse-fast' : 'pulse'} 2s infinite;
+        cursor: pointer;
+        transition: all 0.3s ease;
       "></div>
     `,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
   })
 }
 
@@ -50,7 +55,7 @@ function MapUpdater() {
 }
 
 export function MapView() {
-  const { setLayoutState, listings } = useData()
+  const { setLayoutState, filteredListings, selectedListing, setSelectedListing } = useData()
   const { mode } = useTheme()
 
   const cyberColor = mode === 'green' ? '#00FF00' : '#FF9500'
@@ -111,11 +116,24 @@ export function MapView() {
           {cyberpunkTileLayer}
           
           {/* Property Markers */}
-          {listings.map((listing) => (
+          {filteredListings.map((listing) => (
             <Marker
               key={listing.id}
               position={[listing.lat, listing.lng]}
-              icon={createCyberMarker(cyberColor)}
+              icon={createCyberMarker(cyberColor, selectedListing?.id === listing.id)}
+              eventHandlers={{
+                click: () => {
+                  setSelectedListing(listing)
+                },
+                mouseover: (e) => {
+                  const marker = e.target
+                  marker.getElement()?.style.setProperty('transform', 'scale(1.2)')
+                },
+                mouseout: (e) => {
+                  const marker = e.target
+                  marker.getElement()?.style.setProperty('transform', 'scale(1)')
+                }
+              }}
             />
           ))}
 
@@ -175,6 +193,20 @@ export function MapView() {
           0% { box-shadow: 0 0 10px ${cyberColor}; }
           50% { box-shadow: 0 0 20px ${cyberColor}; }
           100% { box-shadow: 0 0 10px ${cyberColor}; }
+        }
+        
+        @keyframes pulse-fast {
+          0% { box-shadow: 0 0 15px ${cyberColor}; }
+          50% { box-shadow: 0 0 25px ${cyberColor}; }
+          100% { box-shadow: 0 0 15px ${cyberColor}; }
+        }
+        
+        .cyber-marker:hover {
+          transform: scale(1.1) !important;
+        }
+        
+        .cyber-marker.selected {
+          animation: pulse-fast 1s infinite;
         }
       `}</style>
 

@@ -44,6 +44,7 @@ export type LayoutState = 'default' | 'map-expanded' | 'photo-expanded'
 
 interface DataContextType {
   listings: Listing[]
+  filteredListings: Listing[]
   selectedListing: Listing | null
   layoutState: LayoutState
   filterCriteria: any
@@ -54,6 +55,7 @@ interface DataContextType {
   setFilterCriteria: (criteria: any) => void
   setMapBounds: (bounds: any) => void
   updateVisibleListings: (listings: Listing[]) => void
+  setFilteredListings: (listings: Listing[]) => void
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined)
@@ -137,6 +139,7 @@ interface DataProviderProps {
 
 export function DataProvider({ children }: DataProviderProps) {
   const [listings] = useState<Listing[]>(mockListings)
+  const [filteredListings, setFilteredListings] = useState<Listing[]>(mockListings)
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null)
   const [layoutState, setLayoutState] = useState<LayoutState>('default')
   const [filterCriteria, setFilterCriteria] = useState({})
@@ -150,6 +153,7 @@ export function DataProvider({ children }: DataProviderProps) {
   return (
     <DataContext.Provider value={{
       listings,
+      filteredListings,
       selectedListing,
       layoutState,
       filterCriteria,
@@ -159,7 +163,8 @@ export function DataProvider({ children }: DataProviderProps) {
       setLayoutState,
       setFilterCriteria,
       setMapBounds,
-      updateVisibleListings
+      updateVisibleListings,
+      setFilteredListings
     }}>
       {children}
     </DataContext.Provider>

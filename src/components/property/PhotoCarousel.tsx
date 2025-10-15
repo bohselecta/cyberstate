@@ -28,21 +28,24 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
   }
 
   return (
-    <div className="w-full h-full relative bg-cyber-bg">
+    <div className="w-full h-full relative bg-cyber-bg group">
 
       {/* Main Image */}
-      <div className="w-full h-full relative">
+      <div className="w-full h-full relative overflow-hidden">
         <img
           src={photos[currentIndex]}
           alt={`Property photo ${currentIndex + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        
+        {/* Image Loading Overlay */}
+        <div className="absolute inset-0 bg-cyber-bg opacity-0 transition-opacity duration-300" id="loading-overlay"></div>
 
         {/* Overlay Controls */}
-        <div className="absolute inset-0 flex items-center justify-between p-4">
+        <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={prevPhoto}
-            className="w-10 h-10 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all opacity-80 hover:opacity-100"
+            className="w-12 h-12 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all hover:scale-110 cyber-glow"
             aria-label="Previous photo"
           >
             <ChevronLeft className="w-6 h-6" />
@@ -50,7 +53,7 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
 
           <button
             onClick={nextPhoto}
-            className="w-10 h-10 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all opacity-80 hover:opacity-100"
+            className="w-12 h-12 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all hover:scale-110 cyber-glow"
             aria-label="Next photo"
           >
             <ChevronRight className="w-6 h-6" />
@@ -58,15 +61,15 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
         </div>
 
         {/* Top Right Controls */}
-        <div className="absolute top-4 right-4 flex space-x-2">
+        <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
-            className="w-8 h-8 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all opacity-80 hover:opacity-100"
+            className="w-10 h-10 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all hover:scale-110"
             aria-label="Favorite property"
           >
             <Heart className="w-4 h-4" />
           </button>
           <button
-            className="w-8 h-8 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all opacity-80 hover:opacity-100"
+            className="w-10 h-10 bg-cyber-panel border border-current flex items-center justify-center hover:bg-current hover:text-cyber-bg transition-all hover:scale-110"
             aria-label="Fullscreen view"
           >
             <Maximize className="w-4 h-4" />
@@ -87,9 +90,9 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-12 h-12 border transition-all ${
+                className={`w-12 h-12 border transition-all hover:scale-110 ${
                   index === currentIndex
-                    ? 'border-current cyber-glow'
+                    ? 'border-current cyber-glow scale-110'
                     : 'border-current opacity-60 hover:opacity-100'
                 }`}
               >
@@ -100,6 +103,11 @@ export function PhotoCarousel({ photos }: PhotoCarouselProps) {
                 />
               </button>
             ))}
+            {photos.length > 5 && (
+              <div className="w-12 h-12 border border-current opacity-60 flex items-center justify-center text-xs font-mono">
+                +{photos.length - 5}
+              </div>
+            )}
           </div>
 
         </div>
